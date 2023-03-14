@@ -7,7 +7,6 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import numpy as np
 
-
 class MainWindow(QMainWindow):
 	def __init__(self):
 		"""Création de la fenêtre QT (avec un graphique à l'intérieur)"""
