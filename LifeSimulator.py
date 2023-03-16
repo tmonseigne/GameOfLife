@@ -60,6 +60,20 @@ class LifeSimulator:
 		plt.show()
 
 	##################################################
+	def draw_on_fig(self, fig, canvas):
+		"""Dessine le tableau avec matplotlib dans une figure et un canvas preexistant."""
+		fig.clf()  # Efface le contenu de la figure existante
+		ax = fig.add_subplot(111)
+		ax.imshow(self.space[:,::-1].T, cmap="gray_r")
+		ax.grid(color='lightblue', linestyle='-', linewidth=0.5) 
+		ax.tick_params(bottom=False, left=False, labelbottom=False, labelleft=False)
+		ax.set_xticks(np.arange(-0.5, self.x + 0.5, 1)) 
+		ax.set_yticks(np.arange(-0.5, self.y + 0.5, 1))
+		fig.tight_layout()
+		canvas.draw()  # Redessine la figure
+
+
+	##################################################
 	def random_seed(self, x = 80, y = 45):
 		"""
 		Creation d'une grille aleatoire de taille x et y mais en forcant une distribution de 20% d'elements en vie.
@@ -74,12 +88,12 @@ class LifeSimulator:
 		self.space = np.random.choice([False, True], size=(self.x, self.y), p=[0.8, 0.2])
 
 # Tests
-r = LifeSimulator()
-print(LifeSimulator.__doc__)
-print(LifeSimulator.load.__doc__)
-print(LifeSimulator.update.__doc__)
-print(LifeSimulator.draw.__doc__)
-print(LifeSimulator.random_seed.__doc__)
-r.draw()
-r.update()
-r.draw()
+#r = LifeSimulator()
+#print(LifeSimulator.__doc__)
+#print(LifeSimulator.load.__doc__)
+#print(LifeSimulator.update.__doc__)
+#print(LifeSimulator.draw.__doc__)
+#print(LifeSimulator.random_seed.__doc__)
+#r.draw()
+#r.update()
+#r.draw()

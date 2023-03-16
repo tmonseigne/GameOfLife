@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QSizePolicy, QVB
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import numpy as np
+from LifeSimulator import LifeSimulator
 
 class MainWindow(QMainWindow):
 	def __init__(self):
@@ -47,28 +48,30 @@ class MainWindow(QMainWindow):
 		layout = QVBoxLayout(self.plot_widget)
 		layout.addWidget(self.canvas)
 
-		# Définition des boutons "Start" et "Stop"
+		# Définition des boutons "Start", "Stop" et "Speed"
 		self.start_button = QtWidgets.QPushButton('Start', self)
 		self.start_button.clicked.connect(self.start_animation)
 		self.stop_button = QtWidgets.QPushButton('Stop', self)
 		self.stop_button.clicked.connect(self.stop_animation)
+		self.speed_button = QtWidgets.QComboBox(self)
+		self.speed_button.addItems(['1000', '100', '10', '1'])
+		self.speed_button.currentIndexChanged.connect(self.update_speed)
 
 		# Ajout des boutons au widget principal
 		button_layout = QtWidgets.QHBoxLayout()
 		button_layout.addWidget(self.start_button)
 		button_layout.addWidget(self.stop_button)
+		button_layout.addWidget(self.speed_button)
 		layout.addLayout(button_layout)
 
-		# Initialisation des données pour le graphique
-		self.x = np.arange(0, 2 * np.pi, 0.01)
-		self.y = np.sin(self.x)
-
-		# Création de la courbe sur le graphique
-		self.line, = self.fig.add_subplot(111).plot(self.x, self.y)
+		# Initialisation du jeu
+		self.game = LifeSimulator()
+		self.game.draw_on_fig(self.fig,self.canvas)
 
 		# Initialisation des variables d'animation
 		self.animation_running = False
 		self.timer = None
+		self.speed = 1
 
 	##### Menu #####
 	def open_file(self):
@@ -91,26 +94,29 @@ class MainWindow(QMainWindow):
 		"""Affiche une pop-up d'aide"""
 		QtWidgets.QMessageBox.about(self, "Aide", "Voici la pop up avec le blabla traditionnel en version non traditionnel.")
 
-	##### Affichage #####
-
+	##### Affichage et Animation #####
 	def start_animation(self):
 		"""Démarre l'animation du graphique"""
 		self.animation_running = True
-		self.timer = self.canvas.new_timer(100, [(self.update_graph, (), {})])
+		self.timer = self.canvas.new_timer(self.speed, [(self.update, (), {})])
 		self.timer.start()
 
 	def stop_animation(self):
 		"""Arrête l'animation du graphique"""
 		self.animation_running = False
-		if self.timer is not None:
-			self.timer.stop()
+		if self.timer is not None: self.timer.stop()
 
-	def update_graph(self):
+	def update(self):
 		"""Met à jour la courbe sur le graphique"""
-		self.x += 0.1
-		self.y = np.sin(self.x)
-		self.line.set_data(self.x, self.y)
-		self.canvas.draw()
+		self.game.update()
+		self.game.draw_on_fig(self.fig,self.canvas)
+
+	def update_speed(self, index):
+		"""Met à jour la vitesse"""
+		self.speed = int(1000 / int(self.speed_button.currentText()))
+		if self.animation_running == True:
+			self.stop_animation()
+			self.start_animation()
 
 if __name__ == '__main__':
 	app = QApplication(sys.argv)
