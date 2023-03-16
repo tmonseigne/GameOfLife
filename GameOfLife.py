@@ -79,16 +79,11 @@ class MainWindow(QMainWindow):
 
 		# Ouvre une boîte de dialogue pour sélectionner un fichier
 		file_path, _ = QFileDialog.getOpenFileName(self, "Ouvrir un fichier", "", "Fichiers texte (*.txt)")
-
 		# Vérifie si l'utilisateur a sélectionné un fichier
 		if file_path:
-			# Charge les données du fichier
-			with open(file_path, "r") as file:
-				data = file.read().splitlines()
-				print(data)
-
+			self.game.load(file_path)
 			# Met à jour les données du graphique
-			# .....
+			self.game.draw_on_fig(self.fig,self.canvas)
 
 	def show_help(self):
 		"""Affiche une pop-up d'aide"""

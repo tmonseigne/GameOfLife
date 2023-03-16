@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 import matplotlib.pyplot as plt
+import re
 
 class LifeSimulator:
 	"""Classe gerant la creation et l'evolution de notre espace de vie."""
@@ -15,7 +16,20 @@ class LifeSimulator:
 		"""Charge un fichier ou une graine aleatoire si aucun fichier."""
 		if file:
 			# Chargement du fichier
-			print('Chargement.....')
+			with open(file, "r") as f:
+				data = f.read()
+				# avec regex c'est rigolo, pour python \s ce sont les espaces, \d les nombres 
+				# group(1) récupère ce qui est dnas la première parenthèse
+				x = int(re.search(r"x\s*=\s*(\d+)", data).group(1))
+				y = int(re.search(r"y\s*=\s*(\d+)", data).group(1))
+
+				# Trouver toutes les coordonnées de la graine puis séparer ces coordonnées
+				seed_str = re.search(r"seed\s*=\s*([^\n]+(?:\n[^\n]+)*)", data).group(1)
+				seed = set((int(x), int(y)) for (x, y) in re.findall(r"\((\d+),\s*(\d+)\)", seed_str))
+
+				# Initialisation de la grille (les coordonnées partent du bas à gauche)
+				self.white_seed(x, y)
+				for s in seed:	self.space[s[0], s[1]] = True
 		else:
 			self.random_seed()
 
@@ -86,6 +100,20 @@ class LifeSimulator:
 		self.x = x
 		self.y = y
 		self.space = np.random.choice([False, True], size=(self.x, self.y), p=[0.8, 0.2])
+	
+	##################################################
+	def white_seed(self, x = 80, y = 45):
+		"""
+		Creation d'une grille vide de taille x et y.
+		
+			Parametres:
+				x (int): Taille en largeur de la grille (par defaut : 80)
+				y (int): Taille en Hauteur de la grille (par defaut : 45)
+		"""
+		# Graine Aléatoire 
+		self.x = x
+		self.y = y
+		self.space = np.full((self.x, self.y), False, dtype=bool)
 
 # Tests
 #r = LifeSimulator()
